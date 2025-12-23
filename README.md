@@ -16,23 +16,23 @@
 ## 🖼️ Project Screenshots
 
 ### 🔐 Login Page
-![Login Page](images/Screenshot 2025-12-23 154946.png)
+![Login Page](images/Screenshot%202025-12-23%20154946.png)
 
 ### 📝 Signup Page
-![Signup Page](images/Screenshot 2025-12-23 160050.png)
+![Signup Page](images/Screenshot%202025-12-23%20160050.png)
 
-### 📊 firebase
-![Sub-Admin Dashboard](images/Screenshot 2025-12-23 160113.png)
+### 🔥 Firebase Authentication & Database
+![Firebase Console](images/Screenshot%202025-12-23%20160113.png)
 
-> 📌 *Note:* Place the images inside an `images` folder in the root directory of the project.
+> 📌 *Note:* Ensure all screenshots are placed inside an `images/` folder in the project root directory.
 
 ---
 
 ## 📌 Project Overview
 
-The **AI Sales & Lead Outreach Agent** is an intelligent, multilingual voice-automation system designed to improve lead engagement and conversion for businesses across sectors such as BFSI, EdTech, Healthcare, Retail, and Agri-Business.
+The **AI Sales & Lead Outreach Agent** is an intelligent, multilingual voice-automation system designed to improve lead engagement and conversion for businesses across sectors such as **BFSI, EdTech, Healthcare, Retail, and Agri-Business**.
 
-The system replaces traditional scripted IVR and expensive human telecalling teams with an **emotion-aware, context-driven AI voice agent** capable of conducting natural conversations in multiple Indian languages.
+The system replaces traditional scripted IVR systems and expensive human telecalling teams with an **emotion-aware, context-driven AI voice agent** capable of conducting natural, human-like conversations in multiple Indian languages.
 
 ---
 
@@ -46,10 +46,10 @@ At the core of the interaction model is the **PESO framework**:
 
 - **Pain** – Identifies customer problems  
 - **Emotion** – Detects emotional cues such as interest, hesitation, or frustration  
-- **Solution** – Offers relevant, context-aware explanations  
+- **Solution** – Provides relevant, context-aware explanations  
 - **Offer** – Delivers persuasive and personalized offers  
 
-This framework enables dynamic adjustment of tone and conversation strategy, resulting in improved trust and higher conversion rates compared to conventional automated systems.
+This framework enables dynamic adjustment of tone and conversation strategy, resulting in improved trust and higher conversion rates compared to conventional automated calling systems.
 
 The system integrates:
 - Automatic Speech Recognition (ASR)
@@ -57,7 +57,7 @@ The system integrates:
 - Adaptive response generation
 - Conversation fallback and recovery mechanisms
 
-By automating repetitive follow-ups and lead qualification, the system reduces dependency on large telecalling teams while enabling massive outreach scalability.
+By automating repetitive follow-ups and lead qualification, the system significantly reduces dependency on large telecalling teams while enabling massive outreach scalability.
 
 ---
 
@@ -65,10 +65,10 @@ By automating repetitive follow-ups and lead qualification, the system reduces d
 
 - Multilingual voice support (Indian regional languages)
 - Emotion and intent detection
-- PESO-based persuasive communication
-- Context-aware dynamic responses
+- PESO-based persuasive communication flow
+- Context-aware and adaptive responses
 - Automatic fallback and conversation recovery
-- High scalability with reduced operational cost
+- Scalable architecture with reduced operational cost
 
 ---
 
@@ -76,6 +76,7 @@ By automating repetitive follow-ups and lead qualification, the system reduces d
 
 - **Frontend**: React + Vite  
 - **Backend**: Node.js / API Services  
+- **Database & Auth**: Firebase  
 - **AI & NLP**: Gemini API  
 - **Workflow Automation**: n8n  
 - **Speech Processing**: ASR & TTS Pipelines  
@@ -98,6 +99,6 @@ https://docs.google.com/spreadsheets/d/13grgYJ0kitDgeOYxyS-cPdC-Ch9gAa_j/edit?gi
 
 ## 🎯 Conclusion
 
-The AI Sales & Lead Outreach Agent presents a scalable, emotionally intelligent, and language-aware solution for modern sales communication. By combining AI-driven voice intelligence with sentiment analysis and automated persuasion, the system improves conversion rates, enhances customer trust, and significantly reduces operational costs.
+The AI Sales & Lead Outreach Agent delivers a scalable, emotionally intelligent, and language-aware solution for modern sales communication. By combining AI-driven voice intelligence with sentiment analysis and automated persuasion, the system enhances customer trust, improves conversion rates, and significantly reduces operational costs.
 
 ---
