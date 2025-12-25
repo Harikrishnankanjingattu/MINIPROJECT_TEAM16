@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, Save, RefreshCw, Trash2 } from 'lucide-react';
+import { UserPlus, Save, RefreshCw, Trash2, Download } from 'lucide-react';
 import { addLead, getLeads, deleteLead } from '../services/firebaseService';
 import { writeToGoogleSheetsViaWebApp } from '../services/googleSheets';
 import '../styles/LeadGeneration.css';
@@ -140,6 +140,64 @@ const LeadGeneration = ({ user }) => {
         }
     };
 
+    const downloadCSV = () => {
+        if (leads.length === 0) {
+            setMessage({
+                type: 'error',
+                text: 'No leads to download'
+            });
+            return;
+        }
+
+        // Create CSV header
+        const headers = ['Name', 'Phone Number', 'Remarks', 'Date Created'];
+
+        // Create CSV rows
+        const rows = leads.map(lead => {
+            const date = lead.createdAt
+                ? new Date(lead.createdAt.seconds * 1000).toLocaleDateString()
+                : 'N/A';
+
+            // Escape commas and quotes in data
+            const escapeCsvValue = (value) => {
+                if (!value) return '';
+                const stringValue = String(value);
+                if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                    return `"${stringValue.replace(/"/g, '""')}"`;
+                }
+                return stringValue;
+            };
+
+            return [
+                escapeCsvValue(lead.name),
+                escapeCsvValue(lead.number),
+                escapeCsvValue(lead.remarks),
+                escapeCsvValue(date)
+            ].join(',');
+        });
+
+        // Combine header and rows
+        const csvContent = [headers.join(','), ...rows].join('\n');
+
+        // Create blob and download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `leads_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setMessage({
+            type: 'success',
+            text: `Downloaded ${leads.length} leads as CSV`
+        });
+    };
+
     return (
         <div className="lead-generation">
             <div className="section-header">
@@ -147,10 +205,16 @@ const LeadGeneration = ({ user }) => {
                     <h1>Lead Generation</h1>
                     <p className="section-subtitle">Capture and manage your leads efficiently</p>
                 </div>
-                <button className="refresh-btn" onClick={loadLeads} disabled={loading}>
-                    <RefreshCw size={18} className={loading ? 'spinning' : ''} />
-                    Refresh
-                </button>
+                <div className="header-actions">
+                    <button className="download-btn" onClick={downloadCSV} disabled={loading || leads.length === 0}>
+                        <Download size={18} />
+                        Download CSV
+                    </button>
+                    <button className="refresh-btn" onClick={loadLeads} disabled={loading}>
+                        <RefreshCw size={18} className={loading ? 'spinning' : ''} />
+                        Refresh
+                    </button>
+                </div>
             </div>
 
             <div className="lead-content">
