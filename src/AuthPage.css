@@ -1,12 +1,3 @@
-/* Main container with light blue background */
-.auth-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f0f7ff;
-    font-family: sans-serif;
-}
 
 /* White card for the form */
 .auth-box {
