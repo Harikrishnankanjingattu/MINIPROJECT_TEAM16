@@ -8,8 +8,8 @@ import { doc, setDoc } from 'firebase/firestore';
 import './AuthPage.css';
 //login page -by tobi tose 
 //signup -shahin p
-const AuthPage = ({ initialMode = 'login' }) => {
-  const [isLogin, setIsLogin] = useState(initialMode === 'login');
+const AuthPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -24,23 +24,7 @@ const AuthPage = ({ initialMode = 'login' }) => {
 
     try {
       if (isLogin) {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        // Check if user is disabled
-        const { getDoc, doc } = await import('firebase/firestore');
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-
-        if (userDoc.exists() && userDoc.data().status === 'disabled') {
-          await auth.signOut();
-          setMessage({
-            type: 'error',
-            text: 'This account has been disabled by the administrator.',
-          });
-          setLoading(false);
-          return;
-        }
-
+        await signInWithEmailAndPassword(auth, email, password);
         setMessage({
           type: 'success',
           text: 'Welcome back! Login successful.',
@@ -54,15 +38,9 @@ const AuthPage = ({ initialMode = 'login' }) => {
 
         const user = userCredential.user;
 
-        const isAdmin = email.toLowerCase() === 'admin@gmail.com';
-
         await setDoc(doc(db, 'users', user.uid), {
-          company: company || (isAdmin ? 'SYSTEM ADMIN' : ''),
+          company: company,
           email: email,
-          role: isAdmin ? 'admin' : 'subadmin',
-          status: 'active',
-          plan: isAdmin ? 'pro' : 'trial',
-          credits: isAdmin ? 999999 : 10,
           joinedAt: new Date().toISOString(),
         });
 
@@ -73,13 +51,9 @@ const AuthPage = ({ initialMode = 'login' }) => {
         setIsLogin(true);
       }
     } catch (error) {
-      let errorMsg = error.message;
-      if (error.code === 'auth/email-already-in-use') {
-        errorMsg = "This email is already registered. Please switch to Login.";
-      }
       setMessage({
         type: 'error',
-        text: errorMsg,
+        text: error.message,
       });
     } finally {
       setLoading(false);

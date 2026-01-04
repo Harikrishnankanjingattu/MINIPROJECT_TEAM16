@@ -16,34 +16,9 @@ const LEADS_COLLECTION = 'leads';
 const CAMPAIGNS_COLLECTION = 'campaigns';
 const USERS_COLLECTION = 'users';
 
-// Credit Management
-export const consumeCredit = async (userId, amount = 1) => {
-    try {
-        const userRef = doc(db, USERS_COLLECTION, userId);
-        const userSnap = await getDocs(query(collection(db, USERS_COLLECTION))); // Simplified, ideally getDoc
-        // Since we already have the profile in the component, we can just update it here
-        // But for safety, we should really use a transaction or increment function
-        const { getDoc, increment } = await import('firebase/firestore');
-        const userDoc = await getDoc(userRef);
-
-        if (userDoc.exists() && userDoc.data().credits > 0) {
-            await updateDoc(userRef, {
-                credits: increment(-amount)
-            });
-            return { success: true };
-        }
-        return { success: false, error: 'Insufficient credits' };
-    } catch (error) {
-        console.error('Error consuming credit:', error);
-        return { success: false, error: error.message };
-    }
-};
-
 // Lead Management
 export const addLead = async (leadData, userId) => {
     try {
-        // We handle credit check in the component for better UX, 
-        // but this is where the actual save happens.
         const docRef = await addDoc(collection(db, LEADS_COLLECTION), {
             ...leadData,
             userId: userId, // Associate lead with user

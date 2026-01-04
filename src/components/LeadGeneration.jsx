@@ -62,12 +62,6 @@ const LeadGeneration = ({ user }) => {
 
         if (!validateForm()) return;
 
-        // Check credits
-        if (userProfile && userProfile.credits <= 0) {
-            setMessage({ type: 'error', text: 'Insufficient credits. Please upgrade your plan.' });
-            return;
-        }
-
         setSubmitting(true);
         setMessage({ type: '', text: '' });
 
@@ -77,22 +71,21 @@ const LeadGeneration = ({ user }) => {
                 timestamp: new Date().toISOString()
             };
 
-            // Consume 1 credit
-            const creditResult = await import('../services/firebaseService').then(m => m.consumeCredit(user.uid, 1));
-
-            if (!creditResult.success) {
-                setMessage({ type: 'error', text: creditResult.error });
-                setSubmitting(false);
-                return;
-            }
+            console.log('Attempting to save lead:', leadData);
+            console.log('User ID:', user?.uid);
 
             // Save to Firebase with userId
             const firebaseResult = await addLead(leadData, user.uid);
 
+            console.log('Firebase result:', firebaseResult);
+
+            // Save to Google Sheets (placeholder - requires setup)
+            const sheetsResult = await writeToGoogleSheetsViaWebApp(leadData);
+
             if (firebaseResult.success) {
                 setMessage({
                     type: 'success',
-                    text: 'Lead saved successfully! 1 Credit consumed.'
+                    text: 'Lead saved successfully to Firebase! (Google Sheets requires API setup)'
                 });
 
                 // Reset form
@@ -100,19 +93,18 @@ const LeadGeneration = ({ user }) => {
 
                 // Reload leads
                 loadLeads();
-
-                // Refresh page after a delay to update sidebar credits (simple approach)
-                setTimeout(() => window.location.reload(), 1500);
             } else {
+                console.error('Firebase save failed:', firebaseResult.error);
                 setMessage({
                     type: 'error',
-                    text: `Failed to save lead: ${firebaseResult.error}`
+                    text: `Failed to save lead: ${firebaseResult.error || 'Unknown error'}`
                 });
             }
         } catch (error) {
+            console.error('Error submitting lead:', error);
             setMessage({
                 type: 'error',
-                text: `An error occurred: ${error.message}`
+                text: `An error occurred: ${error.message || 'Please try again.'}`
             });
         } finally {
             setSubmitting(false);

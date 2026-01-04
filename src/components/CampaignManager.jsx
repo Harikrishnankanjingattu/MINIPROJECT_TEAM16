@@ -67,12 +67,6 @@ const CampaignManager = ({ user }) => {
             return;
         }
 
-        // Check credits
-        if (userProfile && userProfile.credits < 2) {
-            setMessage({ type: 'error', text: 'Insufficient credits. Campaign requires 2 credits.' });
-            return;
-        }
-
         try {
             const campaignData = {
                 name: formData.name,
@@ -82,26 +76,13 @@ const CampaignManager = ({ user }) => {
                 createdDate: new Date().toISOString()
             };
 
-            // Consume 2 credits
-            const creditResult = await import('../services/firebaseService').then(m => m.consumeCredit(user.uid, 2));
-
-            if (!creditResult.success) {
-                setMessage({ type: 'error', text: creditResult.error });
-                return;
-            }
-
             const result = await addCampaign(campaignData, user.uid); // Pass userId
 
             if (result.success) {
-                setMessage({ type: 'success', text: 'Campaign created successfully! 2 Credits consumed.' });
+                setMessage({ type: 'success', text: 'Campaign created successfully!' });
                 setFormData({ name: '', description: '', selectedUsers: [] });
-
-                // Refresh and close after delay
-                setTimeout(() => {
-                    setShowModal(false);
-                    loadData();
-                    window.location.reload();
-                }, 1500);
+                setShowModal(false);
+                loadData();
             } else {
                 setMessage({ type: 'error', text: 'Failed to create campaign' });
             }
