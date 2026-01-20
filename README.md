@@ -16,6 +16,9 @@
 | Sub-Admin Dashboard | Harikrishnan K |
 | Firebase Authentication Setup | Harikrishnan K |
 | Firebase Database & Rules Creation | Harikrishnan K |
+| Login page | Muhammed Shahin P |
+| n8n workflow creation and updation | Tobi Tose P |
+| admin role management  | Harikrishnan K |
 
 ---
 
