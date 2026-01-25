@@ -4,11 +4,12 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import './AuthPage.css';
-
-const AuthPage = ({ initialMode = 'login' }) => {
-  const [isLogin, setIsLogin] = useState(initialMode === 'login');
+//login page -by tobi tose 
+//signup -shahin p
+const AuthPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -23,22 +24,7 @@ const AuthPage = ({ initialMode = 'login' }) => {
 
     try {
       if (isLogin) {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        // Check if user is suspended
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-
-        if (userDoc.exists() && userDoc.data().status === 'suspended') {
-          await auth.signOut();
-          setMessage({
-            type: 'error',
-            text: 'This account has been suspended by the administrator.',
-          });
-          setLoading(false);
-          return;
-        }
-
+        await signInWithEmailAndPassword(auth, email, password);
         setMessage({
           type: 'success',
           text: 'Welcome back! Login successful.',
@@ -51,15 +37,10 @@ const AuthPage = ({ initialMode = 'login' }) => {
         );
 
         const user = userCredential.user;
-        const isAdmin = email.toLowerCase() === 'admin@gmail.com';
 
         await setDoc(doc(db, 'users', user.uid), {
-          company: company || (isAdmin ? 'SYSTEM ADMIN' : ''),
+          company: company,
           email: email,
-          role: isAdmin ? 'admin' : 'subadmin',
-          status: 'active',
-          plan: isAdmin ? 'pro' : 'trial',
-          credits: isAdmin ? 999999 : 10,
           joinedAt: new Date().toISOString(),
         });
 
@@ -70,21 +51,27 @@ const AuthPage = ({ initialMode = 'login' }) => {
         setIsLogin(true);
       }
     } catch (error) {
-      let errorMsg = error.message;
-      if (error.code === 'auth/email-already-in-use') {
-        errorMsg = "This email is already registered. Please switch to Login.";
-      }
       setMessage({
         type: 'error',
-        text: errorMsg,
+        text: error.message,
       });
     } finally {
       setLoading(false);
     }
   };
 
+  const handleMouseMove = (e) => {
+    const x = e.clientX;
+    const y = e.clientY;
+    document.documentElement.style.setProperty('--x', `${x}px`);
+    document.documentElement.style.setProperty('--y', `${y}px`);
+  };
+
   return (
-    <div className="auth-wrapper">
+    <div className="auth-wrapper" onMouseMove={handleMouseMove}>
+      <div className="spotlight-beam"></div>
+      <div className="geo-shape shape-1"></div>
+      <div className="geo-shape shape-2"></div>
       <div className="auth-box">
         <header>
           <h1>{isLogin ? 'Welcome Back' : 'Get Started'}</h1>
