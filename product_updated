@@ -1,0 +1,487 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "872fe48a-a84e-497e-bf75-6e1520231d2d",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1200,
+        -64
+      ],
+      "webhookId": "39acf0d6-c419-48a2-a8f3-495c41e08189",
+      "credentials": {
+        "telegramApi": {
+          "id": "GMBYC3ri8CktgSoN",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "userLanguage",
+              "value": "={{ $json.message.from.language_code }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "chatId",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "a9bb0a82-e531-46ec-903f-aae3a07f59e3",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -976,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.voice }}",
+              "operator": {
+                "type": "object",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "87c3c6e9-02c4-4126-8d90-93a88bce4074",
+      "name": "Check if Audio",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -752,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Transcribe this audio message and identify: 1) Customer name if mentioned, 2) Language being spoken, 3) Customer needs, preferences, or product questions, 4) Any specific product interests or inquiries. Do not assume product type - let the customer specify what they are looking for.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "id": "7cce2e48-147e-4ede-b733-cc1dff14adfe",
+      "name": "Analyze Audio with Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -64
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "lzHLYqsNLdMN4qZo",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content.parts[0].text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a friendly product sales assistant.\n\nYour task is to:\n1. ALWAYS use the Product Database Tool FIRST to search the Google Sheets for relevant product information before generating any response\n2. The database contains: product name, product details, price, and offer price\n3. Query the tool to get accurate, current product data\n4. Based on the tool results, recommend specific products that match customer needs\n5. Be conversational, friendly, and personalized\n6. ALWAYS respond in the SAME language the customer used\n7. DO NOT retain any previous conversation context - treat each request as new\n\nUser Language: {{ $('Workflow Configuration').first().json.userLanguage }}\n\nCRITICAL OUTPUT FORMAT REQUIREMENTS:\nYou MUST return your response in the following JSON format with ALL required fields:\n{\n  \"customerName\": \"Customer name if provided, otherwise 'Not provided'\",\n  \"detectedLanguage\": \"Language detected from customer speech\",\n  \"customerNeeds\": \"Identified customer needs or preferences\",\n  \"productName\": \"Recommended product name from database\",\n  \"productDetails\": \"Product details from database\",\n  \"originalPrice\": \"Original price from database\",\n  \"offerPrice\": \"Offer price from database\",\n  \"audioResponse\": \"Complete conversational response starting with 'hey i have a cool offer today' followed by product recommendation with prices and details in the customer's language\"\n}\n\nThe audioResponse field should contain your full conversational message to the customer while maintaining the JSON structure. Do not return plain text - ONLY return valid JSON with all fields populated."
+        }
+      },
+      "id": "393985be-e1d0-46b3-a3f8-9a2085fdbe41",
+      "name": "Market Analysis Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        48,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "839d0be7-b0af-41dc-b26c-ebddcf9052ea",
+      "name": "Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        160
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "lzHLYqsNLdMN4qZo",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Workflow Configuration').first().json.chatId }}"
+      },
+      "id": "015d58dd-8841-4764-9793-2360e518e961",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "2c156506-ef40-4201-a24b-f55e63026214",
+      "name": "Download Audio File",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        -64
+      ],
+      "webhookId": "24fe38bd-b58e-46f7-b913-9d9e9123bcee",
+      "credentials": {
+        "telegramApi": {
+          "id": "GMBYC3ri8CktgSoN",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output.audioResponse }}",
+        "voiceId": {
+          "__rl": true,
+          "value": "en-UK-hazel",
+          "mode": "list",
+          "cachedResultName": "Hazel (F)"
+        },
+        "multiNativeLocale": {
+          "__rl": true,
+          "value": "en-US",
+          "mode": "list",
+          "cachedResultName": "English (US & Canada)"
+        },
+        "style": {
+          "__rl": true,
+          "value": "Conversational",
+          "mode": "list",
+          "cachedResultName": "Conversational"
+        },
+        "format": "MP3",
+        "additionalOptions": {}
+      },
+      "type": "n8n-nodes-murf.murf",
+      "typeVersion": 1,
+      "position": [
+        512,
+        -64
+      ],
+      "id": "15c6b026-9de0-49ee-a915-eb547fe3650a",
+      "name": "Generate speech from text",
+      "credentials": {
+        "murfApi": {
+          "id": "roNXKQrC5QRdOefR",
+          "name": "Murf account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.audioFile }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "d314b46f-d6eb-4f74-91de-b3ea0455113c",
+      "name": "Download Audio from Murf",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        736,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Workflow Configuration').first().json.chatId }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "id": "6222b519-11a8-4a5f-8ffb-1d426f431840",
+      "name": "Send Audio to User",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -64
+      ],
+      "webhookId": "30e38cd0-0ccf-4c79-9e81-720c41da7a5c",
+      "credentials": {
+        "telegramApi": {
+          "id": "GMBYC3ri8CktgSoN",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Search and retrieve product information from the Google Sheets database. The sheet contains product name, product details, price, and offer price columns. Use this tool EVERY TIME to get current product data before responding to any customer query about products, prices, or offers.",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1Qa1QO9BUduwL5P3W_4ulaTHMfbeOwnrrp5UJkArA4d0/edit?gid=0#gid=0"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "0"
+        },
+        "options": {}
+      },
+      "id": "102f2a10-e025-4af1-b107-f19b1b3abd53",
+      "name": "Product Database Tool",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5PEWVoFy2eLNfJLh",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"customerName\": \"Customer name if provided\",\n\t\"detectedLanguage\": \"Language detected from customer speech\",\n\t\"customerNeeds\": \"Identified customer needs or preferences\",\n\t\"productName\": \"Recommended product name from database\",\n\t\"productDetails\": \"Product details from database\",\n\t\"originalPrice\": \"Original price from database\",\n\t\"offerPrice\": \"Offer price from database\",\n\t\"audioResponse\": \"Complete response starting with greeting and product recommendation in customer language based on current database query\"\n}",
+        "autoFix": true
+      },
+      "id": "019b7c4a-379c-4c74-a8c8-d433d5bfcf37",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        368
+      ],
+      "id": "d62da772-dc08-48ee-84df-93a411442d6f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "lzHLYqsNLdMN4qZo",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Check if Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Audio": {
+      "main": [
+        [
+          {
+            "node": "Download Audio File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Audio with Gemini": {
+      "main": [
+        [
+          {
+            "node": "Market Analysis Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Analysis Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate speech from text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Market Analysis Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Market Analysis Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio File": {
+      "main": [
+        [
+          {
+            "node": "Analyze Audio with Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate speech from text": {
+      "main": [
+        [
+          {
+            "node": "Download Audio from Murf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio from Murf": {
+      "main": [
+        [
+          {
+            "node": "Send Audio to User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Database Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Analysis Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Market Analysis Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "142d67fb7c93a7f7da4817eaad92e9b7072b94e93e04980ee0472c8c95dd61f6"
+  }
+}
