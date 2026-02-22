@@ -83,136 +83,107 @@ const AuthPage = ({ initialMode = 'login', onGoogleAuth, googleToken }) => {
   };
 
   return (
+  return (
     <div className="auth-mesh-bg">
-      <div className="auth-wrapper">
-        <div className="auth-brand-side">
-          <div className="brand-overlay"></div>
-          <div className="brand-content">
-            <div className="brand-badge reveal-up">Enterprise Edition</div>
-            <h2 className="reveal-up delay-1">
-              Next-Gen <br /><span>Voice Automation</span>
-            </h2>
-            <p className="reveal-up delay-2">
-              Empower your sales pipeline with emotion-aware AI agents that talk like humans and close like experts.
+      <div className="auth-wrapper centered">
+        <div className="auth-container glass-effect animate-fade">
+          <header className="auth-header">
+            <div className="auth-logo-box">
+              <Bot size={32} color="white" strokeWidth={2.5} />
+            </div>
+            <h1 className="auth-title">
+              AutoConnect AI
+            </h1>
+            <p className="auth-subtitle">
+              {isLogin
+                ? 'Sign in to your orchestration hub.'
+                : 'Request enterprise-grade voice automation.'}
             </p>
+          </header>
 
-            <ul className="brand-features">
-              <li className="reveal-up delay-2">
-                <div className="feat-icon"><Bot size={18} /></div>
-                <span>Emotion Detection Engine</span>
-              </li>
-              <li className="reveal-up delay-2">
-                <div className="feat-icon"><Globe size={18} /></div>
-                <span>12+ Global Accent Profiles</span>
-              </li>
-              <li className="reveal-up delay-2">
-                <div className="feat-icon"><TrendingUp size={18} /></div>
-                <span>Autonomous Lead Scoring</span>
-              </li>
-            </ul>
-          </div>
-        </div>
+          {message.text && (
+            <div className={`auth-message ${message.type}`}>
+              {message.text}
+            </div>
+          )}
 
-        <div className="auth-form-side">
-          <div className="auth-container glass-effect">
-            <header className="auth-header">
-              <div className="auth-logo-box">
-                <Bot size={28} color="white" strokeWidth={2.5} />
-              </div>
-              <h1 className="auth-title">
-                {isLogin ? 'Welcome Back' : 'Get Started'}
-              </h1>
-              <p className="auth-subtitle">
-                {isLogin
-                  ? 'Access your Master Console telemetry.'
-                  : 'Establish your enterprise orchestration hub.'}
-              </p>
-            </header>
-
-            {message.text && (
-              <div className={`auth-message ${message.type} animate-fade`}>
-                {message.text}
+          <form onSubmit={handleAuth} className="auth-form">
+            {!isLogin && (
+              <div className="form-group">
+                <label>Organization</label>
+                <div className="input-container">
+                  <Building2 className="input-icon" size={18} />
+                  <input
+                    type="text"
+                    placeholder="e.g. Nexus Industries"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
             )}
 
-            <form onSubmit={handleAuth} className="auth-form">
-              {!isLogin && (
-                <div className="form-group reveal-up delay-1">
-                  <label>Business Entity</label>
-                  <div className="input-container">
-                    <Building2 className="input-icon" size={18} />
-                    <input
-                      type="text"
-                      placeholder="e.g. Nexus Global"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="form-group reveal-up delay-1">
-                <label>Admin Email</label>
-                <div className="input-container">
-                  <Mail className="input-icon" size={18} />
-                  <input
-                    type="email"
-                    placeholder="admin@nexus.ai"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
+            <div className="form-group">
+              <label>Admin Email</label>
+              <div className="input-container">
+                <Mail className="input-icon" size={18} />
+                <input
+                  type="email"
+                  placeholder="admin@nexus.ai"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
-
-              <div className="form-group reveal-up delay-2">
-                <label>Access Key</label>
-                <div className="input-container">
-                  <Lock className="input-icon" size={18} />
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="auth-submit-btn reveal-up delay-3"
-                disabled={loading}
-              >
-                {loading ? 'Authenticating...' : (isLogin ? 'Initialize Session' : 'Create Master Account')}
-                {!loading && <ArrowRight size={18} style={{ marginLeft: '8px' }} />}
-              </button>
-
-              <div className="auth-divider reveal-up delay-3">
-                <span>or continue with</span>
-              </div>
-
-              <button
-                type="button"
-                className="google-auth-btn reveal-up delay-3"
-                onClick={handleGoogleAuth}
-                disabled={loading}
-              >
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
-                Google Workspace
-              </button>
-            </form>
-
-            <div className="toggle-auth reveal-up delay-3">
-              <p>
-                {isLogin ? "New to AutoConnect?" : 'Already registered?'}
-                <button type="button" onClick={() => setIsLogin(!isLogin)}>
-                  {isLogin ? 'Request Access' : 'Return to Login'}
-                </button>
-              </p>
             </div>
-          </div>
+
+            <div className="form-group">
+              <label>Access Key</label>
+              <div className="input-container">
+                <Lock className="input-icon" size={18} />
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="auth-submit-btn"
+              disabled={loading}
+            >
+              {loading ? 'Authenticating...' : (isLogin ? 'Initialize Session' : 'Create Master Account')}
+              {!loading && <ArrowRight size={18} style={{ marginLeft: '8px' }} />}
+            </button>
+
+            <div className="auth-divider">
+              <span>or secure connect</span>
+            </div>
+
+            <button
+              type="button"
+              className="google-auth-btn"
+              onClick={handleGoogleAuth}
+              disabled={loading}
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+              Google Workspace
+            </button>
+          </form>
+
+          <footer className="auth-footer">
+            <p>
+              {isLogin ? "New to the platform?" : 'Already registered?'}
+              <button type="button" onClick={() => setIsLogin(!isLogin)}>
+                {isLogin ? 'Request Access' : 'Return to Login'}
+              </button>
+            </p>
+          </footer>
         </div>
       </div>
     </div>
