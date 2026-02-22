@@ -19,6 +19,7 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [activeTab, setActiveTab] = useState('users');
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const [moduleSettings, setModuleSettings] = useState({
         leadsEnabled: true,
@@ -137,6 +138,20 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }) => {
         totalCredits: users.reduce((acc, curr) => acc + (curr.credits || 0), 0)
     };
 
+    const handleLogout = async () => {
+        try {
+            await auth.signOut();
+        } catch (error) {
+            console.error("Logout Error:", error);
+        }
+    };
+
+    const handleSectionChange = (section) => {
+        if (section === 'dashboard' || section === 'leads') setActiveTab('users');
+        else if (section === 'products') setActiveTab('products');
+        if (isMobile) setIsMobileMenuOpen(false);
+    };
+
     if (loading) return (
         <div className="admin-loading" style={{ background: '#0f172a', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
             <div className="spinner" style={{ border: '4px solid rgba(255,255,255,0.1)', borderTop: '4px solid #3b82f6', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite' }}></div>
@@ -160,11 +175,14 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }) => {
 
             {!isMobile && (
                 <Sidebar
-                    activeSection="dashboard"
-                    onSectionChange={() => { }}
+                    activeSection={activeTab === 'users' ? 'dashboard' : 'products'}
+                    onSectionChange={handleSectionChange}
                     user={user}
                     userProfile={userProfile}
-                    onLogout={() => auth.signOut()}
+                    onLogout={handleLogout}
+                    isMobile={isMobile}
+                    isMobileOpen={isMobileMenuOpen}
+                    toggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 />
             )}
 
