@@ -83,7 +83,6 @@ const AuthPage = ({ initialMode = 'login', onGoogleAuth, googleToken }) => {
   };
 
   return (
-  return (
     <div className="auth-mesh-bg">
       <div className="auth-wrapper centered">
         <div className="auth-container glass-effect animate-fade">
