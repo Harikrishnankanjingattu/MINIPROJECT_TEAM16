@@ -11,7 +11,7 @@
     color: var(--text-on-dark);
     transition: var(--transition);
     z-index: 1000;
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .sidebar-header {
@@ -40,7 +40,7 @@
     font-weight: 800;
     font-size: 1.15rem;
     letter-spacing: -0.01em;
-    color: white;
+    color: var(--text-primary);
 }
 
 .sidebar-content {
@@ -61,7 +61,7 @@
 .section-tag {
     font-size: 0.65rem;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     padding: 0 0.875rem 0.5rem;
@@ -73,7 +73,7 @@
     gap: 0.875rem;
     padding: 0.75rem 0.875rem;
     border-radius: var(--radius-sm);
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     text-decoration: none;
     background: transparent;
     border: none;
@@ -86,8 +86,8 @@
 }
 
 .nav-link:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
 }
 
 .nav-link.active {
@@ -106,7 +106,7 @@
 
 .sidebar-footer {
     padding: 1.25rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .user-profile-mini {
@@ -114,9 +114,9 @@
     align-items: center;
     gap: 0.875rem;
     padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.02);
     border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .avatar-initial {
@@ -140,7 +140,7 @@
 .user-name {
     font-weight: 600;
     font-size: 0.8125rem;
-    color: white;
+    color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -149,14 +149,14 @@
 
 .user-plan {
     font-size: 0.6875rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     margin: 0;
 }
 
 .btn-logout {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     cursor: pointer;
     transition: var(--transition);
     padding: 0.5rem;
