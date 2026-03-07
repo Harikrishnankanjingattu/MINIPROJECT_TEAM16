@@ -8,7 +8,7 @@ import {
   signInWithPopup
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { Mail, Lock, Building2, Bot, ArrowRight, Zap } from 'lucide-react';
+import { Mail, Lock, Building2, Bot, ArrowRight, Zap, Hexagon } from 'lucide-react';
 
 interface AuthPageProps {
   initialMode?: string;
@@ -94,10 +94,14 @@ const AuthPage = ({ initialMode = 'login', onGoogleAuth, googleToken }: AuthPage
         className="glass-card w-full max-w-md p-8 relative z-10"
       >
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
-            <Zap size={28} className="text-primary-foreground" />
+          <div className="relative w-14 h-14 mx-auto mb-4 flex items-center justify-center group">
+            <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy rounded-2xl blur opacity-60 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative w-14 h-14 bg-background border border-white/20 rounded-2xl flex items-center justify-center overflow-hidden shadow-2xl">
+              <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy opacity-40 group-hover:opacity-60 transition-opacity"></div>
+              <Hexagon size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse-glow" />
+            </div>
           </div>
-          <h1 className="text-2xl font-bold font-display text-foreground">GAMMA</h1>
+          <h1 className="text-2xl font-bold font-display tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60 mb-2">GAMMA</h1>
           <p className="text-sm text-muted-foreground mt-2">
             {isLogin ? 'Sign in to your dashboard.' : 'Create your automation account.'}
           </p>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   LayoutDashboard, UserPlus, Megaphone, ChevronLeft, ChevronRight,
-  LogOut, User, PhoneForwarded, Package, Zap
+  LogOut, User, PhoneForwarded, Package, Zap, Hexagon
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -47,11 +47,15 @@ const GammaSidebar = ({
         ${isMobile ? (isMobileOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
       `}>
         <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-          <div className="flex items-center gap-2 overflow-hidden">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-              <Zap size={16} className="text-primary-foreground" />
+          <div className="flex items-center gap-2 overflow-hidden group">
+            <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
+              <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy rounded-lg blur opacity-50 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative w-8 h-8 bg-background border border-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                <Hexagon size={16} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse-glow" />
+              </div>
             </div>
-            {!collapsed && <span className="text-sm font-bold font-display text-foreground truncate">GAMMA</span>}
+            {!collapsed && <span className="text-[15px] font-bold font-display truncate tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">GAMMA</span>}
           </div>
           {!isMobile && (
             <button
@@ -72,11 +76,8 @@ const GammaSidebar = ({
               <button
                 key={item.id}
                 className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200
-                  ${active
-                    ? 'bg-primary/10 text-primary font-medium'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                  }
+                  nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200
+                  ${active ? 'active' : 'text-sidebar-foreground'}
                   ${collapsed ? 'justify-center' : ''}
                 `}
                 onClick={() => {
@@ -85,7 +86,7 @@ const GammaSidebar = ({
                 }}
                 title={collapsed ? item.label : undefined}
               >
-                <Icon size={18} className="shrink-0" />
+                <Icon size={18} className="nav-icon shrink-0" />
                 {!collapsed && <span className="truncate">{item.label}</span>}
                 {active && !collapsed && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />}
               </button>

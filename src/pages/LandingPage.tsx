@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   Bot, Globe, MessageSquare, Database, Calendar, ShieldCheck,
   TrendingUp, Briefcase, GraduationCap, Hospital, Store, Leaf,
-  Github, Twitter, Linkedin, Menu, X, ArrowRight, Zap, ChevronRight
+  Github, Twitter, Linkedin, Menu, X, ArrowRight, Zap, ChevronRight, Hexagon
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -50,11 +50,17 @@ const LandingPage = ({ onGetStarted, onLogin }: LandingPageProps) => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto px-4 md:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Zap size={18} className="text-primary-foreground" />
+          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => window.scrollTo(0, 0)}>
+            <div className="relative w-8 h-8 flex items-center justify-center">
+              <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy rounded-lg blur opacity-60 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative w-8 h-8 bg-background border border-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                <Hexagon size={16} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse-glow" />
+              </div>
             </div>
-            <span className="text-lg font-bold font-display">GAMMA</span>
+            <span className="text-xl font-bold font-display tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">
+              GAMMA
+            </span>
           </div>
 
           <nav className="hidden md:flex items-center gap-1">
@@ -251,11 +257,17 @@ const LandingPage = ({ onGetStarted, onLogin }: LandingPageProps) => {
       <footer className="border-t border-border/30 py-12 px-4">
         <div className="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Zap size={18} className="text-primary-foreground" />
+            <div className="flex items-center gap-2 mb-4 group">
+              <div className="relative w-8 h-8 flex items-center justify-center">
+                <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy rounded-lg blur opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative w-8 h-8 bg-background border border-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                  <Hexagon size={16} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse-glow" />
+                </div>
               </div>
-              <span className="text-lg font-bold font-display">GAMMA</span>
+              <span className="text-xl font-bold font-display tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">
+                GAMMA
+              </span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">Empowering businesses with intelligent, emotion-aware voice agents.</p>
             <div className="flex gap-3">
@@ -280,7 +292,7 @@ const LandingPage = ({ onGetStarted, onLogin }: LandingPageProps) => {
           ))}
         </div>
         <div className="container mx-auto max-w-6xl mt-8 pt-6 border-t border-border/30 text-center text-xs text-muted-foreground">
-          © 2026 GAMMA. All rights reserved.
+          © 2026 GAMMA AI. All rights reserved.
         </div>
       </footer>
     </div>

@@ -1,17 +1,29 @@
-/* --- Stable Premium Auth Redesign --- */
+/* --- Retell AI Vibrant Glassmorphism Auth --- */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&display=swap');
+
 .auth-mesh-bg {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #f8fafc;
+    background-color: #050505;
     background-image:
-        radial-gradient(at 0% 0%, hsla(212, 100%, 92%, 1) 0, transparent 50%),
-        radial-gradient(at 100% 0%, hsla(200, 100%, 92%, 1) 0, transparent 50%),
-        radial-gradient(at 100% 100%, hsla(215, 100%, 92%, 1) 0, transparent 50%),
-        radial-gradient(at 0% 100%, hsla(205, 100%, 92%, 1) 0, transparent 50%);
+        radial-gradient(circle at 15% 50%, rgba(168, 85, 247, 0.15) 0, transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15) 0, transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.15) 0, transparent 50%);
     z-index: -1;
+    animation: pulse 10s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 .auth-wrapper.centered {
@@ -20,19 +32,20 @@
     align-items: center;
     min-height: 100vh;
     padding: 2rem;
-    perspective: 1000px;
+    position: relative;
+    z-index: 1;
 }
 
 .auth-container {
     width: 100%;
-    max-width: 480px;
-    padding: 3.5rem 3rem;
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.15);
+    max-width: 440px;
+    padding: 3rem 2.5rem;
+    border-radius: 24px;
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
 }
 
 .auth-header {
@@ -41,48 +54,45 @@
 }
 
 .auth-logo-box {
-    width: 72px;
-    height: 72px;
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
     margin: 0 auto 1.5rem;
-    border-radius: 20px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
 }
 
 .auth-title {
     font-family: 'Outfit', sans-serif;
-    font-size: 2.25rem;
-    font-weight: 800;
-    color: #0f172a;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #ffffff;
     margin-bottom: 0.5rem;
     letter-spacing: -0.02em;
 }
 
 .auth-subtitle {
-    color: #475569;
-    font-size: 1rem;
-    max-width: 300px;
+    color: #a1a1aa;
+    font-size: 0.95rem;
     margin: 0 auto;
 }
 
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.25rem;
 }
 
 .form-group label {
     display: block;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    color: #475569;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #e4e4e7;
     margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding-left: 4px;
 }
 
 .input-container {
@@ -93,61 +103,61 @@
 
 .input-icon {
     position: absolute;
-    left: 1.25rem;
-    color: #64748b;
+    left: 1rem;
+    color: #71717a;
     pointer-events: none;
-    transition: var(--transition);
+    transition: color 0.2s;
 }
 
 .input-container input {
     width: 100%;
-    padding: 1rem 1.25rem 1rem 3.5rem;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 14px;
-    color: #0f172a;
-    font-size: 1rem;
-    transition: var(--transition);
+    padding: 0.85rem 1rem 0.85rem 2.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    transition: all 0.2s;
 }
 
 .input-container input:focus {
     outline: none;
-    background: rgba(255, 255, 255, 1);
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #a855f7;
+    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15);
 }
 
 .input-container input:focus+.input-icon {
-    color: #3b82f6;
+    color: #a855f7;
 }
 
 .auth-submit-btn {
     width: 100%;
-    padding: 1.125rem;
-    background: #0066ff;
+    padding: 1rem;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
     color: white;
     border: none;
-    border-radius: 14px;
-    font-weight: 700;
-    font-size: 1.125rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.2s;
     margin-top: 0.5rem;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
 }
 
 .auth-submit-btn:hover {
-    background: #0052cc;
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0, 102, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
 }
 
 .auth-divider {
     text-align: center;
     position: relative;
-    margin: 0.5rem 0;
+    margin: 1.5rem 0;
 }
 
 .auth-divider::before {
@@ -157,98 +167,89 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .auth-divider span {
     position: relative;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 0 1rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #64748b;
+    background: #141414;
+    /* matches near card bg */
+    padding: 0 0.75rem;
+    font-size: 0.85rem;
+    color: #71717a;
+    border-radius: 99px;
 }
 
 .google-auth-btn {
     width: 100%;
-    padding: 1rem;
-    background: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 14px;
-    color: #0f172a;
-    font-weight: 600;
+    padding: 0.875rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #ffffff;
+    font-weight: 500;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.2s;
 }
 
 .google-auth-btn:hover {
-    background: rgba(0, 0, 0, 0.03);
-    border-color: rgba(0, 0, 0, 0.2);
-}
-
-.google-auth-btn img {
-    width: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .auth-footer {
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    margin-top: 2rem;
     text-align: center;
 }
 
 .auth-footer p {
-    font-size: 0.9375rem;
-    color: #475569;
+    font-size: 0.9rem;
+    color: #a1a1aa;
 }
 
 .auth-footer button {
     background: none;
     border: none;
-    color: #3b82f6;
-    font-weight: 700;
+    color: #c084fc;
+    font-weight: 600;
     cursor: pointer;
     margin-left: 0.5rem;
-    font-size: 0.9375rem;
+    transition: color 0.2s;
 }
 
 .auth-footer button:hover {
-    text-decoration: underline;
+    color: #e879f9;
 }
 
-/* Auth Messages */
 .auth-message {
-    padding: 1rem;
+    padding: 0.875rem;
     border-radius: 12px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
     text-align: center;
+    border: 1px solid transparent;
 }
 
 .auth-message.success {
     background: rgba(16, 185, 129, 0.1);
     color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.2);
 }
 
 .auth-message.error {
     background: rgba(239, 68, 68, 0.1);
     color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.2);
 }
 
-/* Responsive */
 @media (max-width: 480px) {
     .auth-container {
-        padding: 2.5rem 1.5rem;
-        background: transparent;
-        backdrop-filter: none;
-        box-shadow: none;
-        border: none;
+        padding: 2rem 1.5rem;
+        background: rgba(10, 10, 10, 0.8);
     }
 }
