@@ -91,14 +91,14 @@ h6 {
 
   /* Buttons */
   .btn-gamma {
-    @apply relative inline-flex items-center justify-center px-6 py-2.5 rounded-full font-semibold text-white overflow-hidden transition-all duration-300;
+    @apply relative inline-flex items-center justify-center px-6 py-2.5 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 z-0;
     background: linear-gradient(135deg, #a855f7, #ec4899);
     box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .btn-gamma::before {
     content: '';
-    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300 -z-10;
     background: linear-gradient(135deg, #ec4899, #a855f7);
   }
 
@@ -113,10 +113,6 @@ h6 {
 
   .btn-gamma:hover::before {
     @apply opacity-100;
-  }
-
-  .btn-gamma>* {
-    @apply relative z-10;
   }
 
   .btn-gamma-outline {
