@@ -6,8 +6,6 @@ import {
   ToggleRight, Package, Activity, Lock, Unlock, Zap, Menu
 } from 'lucide-react';
 import GammaProductManager from '../components/gamma/GammaProductManager';
-import GammaSidebar from '../components/gamma/GammaSidebar';
-import GammaMobileNav from '../components/gamma/GammaMobileNav';
 
 interface Props {
   user: any;
@@ -111,25 +109,7 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
         </header>
       )}
 
-      {!isMobile && (
-        <GammaSidebar
-          activeSection={activeTab === 'users' ? 'dashboard' : 'products'}
-          onSectionChange={s => { if (s === 'dashboard' || s === 'leads') setActiveTab('users'); else if (s === 'products') setActiveTab('products'); }}
-          user={user} userProfile={userProfile} onLogout={handleLogout}
-          isMobile={false} isMobileOpen={false} toggleMobileMenu={() => {}}
-        />
-      )}
-
-      {isMobile && isMobileMenuOpen && (
-        <GammaSidebar
-          activeSection={activeTab === 'users' ? 'dashboard' : 'products'}
-          onSectionChange={s => { if (s === 'dashboard' || s === 'leads') setActiveTab('users'); else if (s === 'products') setActiveTab('products'); setIsMobileMenuOpen(false); }}
-          user={user} userProfile={userProfile} onLogout={handleLogout}
-          isMobile={true} isMobileOpen={true} toggleMobileMenu={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-
-      <main className={`transition-all duration-300 ${isMobile ? 'pt-14 pb-20 px-4' : 'ml-[240px] p-6'} space-y-6`}>
+      <main className="transition-all duration-300 max-w-7xl mx-auto pt-20 pb-20 px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="section-title text-foreground">Master Console</h1>
@@ -277,13 +257,6 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
         )}
       </main>
 
-      {isMobile && (
-        <GammaMobileNav
-          activeSection={activeTab === 'users' ? 'dashboard' : 'products'}
-          onSectionChange={s => { if (s === 'dashboard' || s === 'leads') setActiveTab('users'); else if (s === 'products') setActiveTab('products'); }}
-          moduleSettings={{ leadsEnabled: true, campaignsEnabled: true }}
-        />
-      )}
     </div>
   );
 };
