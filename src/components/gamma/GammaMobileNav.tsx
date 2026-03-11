@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, UserPlus, Megaphone, Package, PhoneForwarded, User
+  LayoutDashboard, UserPlus, Megaphone, Package, PhoneForwarded, User, Bot
 } from 'lucide-react';
 
 interface MobileNavProps {
@@ -15,6 +15,7 @@ const GammaMobileNav = ({ activeSection, onSectionChange, moduleSettings }: Mobi
     ...(moduleSettings?.campaignsEnabled !== false ? [{ id: 'campaigns', icon: Megaphone, label: 'Ads' }] : []),
     { id: 'products', icon: Package, label: 'Stock' },
     { id: 'history', icon: PhoneForwarded, label: 'Calls' },
+    { id: 'help', icon: Bot, label: 'Chat' },
     { id: 'profile', icon: User, label: 'Me' },
   ];
 

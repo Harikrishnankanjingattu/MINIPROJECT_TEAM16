@@ -11,6 +11,7 @@ import GammaProductManager from '../components/gamma/GammaProductManager';
 import GammaProfileSettings from '../components/gamma/GammaProfileSettings';
 import GammaCallHistory from '../components/gamma/GammaCallHistory';
 import GammaMobileNav from '../components/gamma/GammaMobileNav';
+import GammaHelp from '../components/gamma/GammaHelp';
 
 interface Props {
   user: any;
@@ -79,6 +80,7 @@ const SubAdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Pro
       case 'products': return <GammaProductManager user={user} userProfile={userProfile} googleToken={googleToken} onGoogleAuth={onGoogleAuth} />;
       case 'profile': return <GammaProfileSettings user={user} userProfile={userProfile} googleToken={googleToken} onGoogleAuth={onGoogleAuth} />;
       case 'history': return <GammaCallHistory user={user} />;
+      case 'help': return <GammaHelp />;
       default: return <GammaDashboard user={user} userProfile={userProfile} />;
     }
   };

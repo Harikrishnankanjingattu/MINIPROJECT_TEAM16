@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   LayoutDashboard, UserPlus, Megaphone, ChevronLeft, ChevronRight,
-  LogOut, User, PhoneForwarded, Package, Zap, Hexagon
+  LogOut, User, PhoneForwarded, Package, Zap, Hexagon, Bot
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -33,6 +33,7 @@ const GammaSidebar = ({
     ...(moduleSettings?.campaignsEnabled !== false ? [{ id: 'campaigns', icon: Megaphone, label: 'Campaigns' }] : []),
     { id: 'products', icon: Package, label: 'Products' },
     { id: 'history', icon: PhoneForwarded, label: 'Call History' },
+    { id: 'help', icon: Bot, label: 'Support Chat' },
     { id: 'profile', icon: User, label: 'Account' },
   ];
 
