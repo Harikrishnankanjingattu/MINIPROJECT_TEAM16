@@ -115,8 +115,16 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
             <h1 className="section-title text-foreground">Master Console</h1>
             <p className="section-subtitle">Sub-admin orchestration & system telemetry</p>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> System Online
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> System Online
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/10 transition-colors text-xs font-semibold"
+            >
+              <LogOut size={16} /> Logout
+            </button>
           </div>
         </div>
 
