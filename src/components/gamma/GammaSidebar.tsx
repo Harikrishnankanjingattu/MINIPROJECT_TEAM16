@@ -35,7 +35,7 @@ const GammaSidebar = ({
     { id: 'products', icon: Package, label: 'Products', isSection: true },
     { id: 'history', icon: PhoneForwarded, label: 'Call History', isSection: true },
     { id: 'profile', icon: User, label: 'Account', isSection: true },
-    { id: 'call', icon: Bot, label: 'Need help? Start a call', isSection: false },
+    { id: 'call', icon: Bot, label: 'Test Mode', isSection: false },
   ];
 
   const collapsed = isCollapsed && !isMobile;
@@ -75,7 +75,7 @@ const GammaSidebar = ({
               <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy rounded-lg blur opacity-50 group-hover:opacity-100 transition-opacity"></div>
               <div className="relative w-8 h-8 bg-background border border-white/20 rounded-lg flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(-45deg,#a855f7,#ec4899,#3b82f6,#a855f7)] bg-[length:400%_400%] animate-gradient-xy opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                <Hexagon size={16} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse-glow" />
+                <Hexagon size={16} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-[spin_4s_linear_infinite]" />
               </div>
             </div>
             {!collapsed && <span className="text-[15px] font-bold font-display truncate tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/60">GAMMA</span>}
