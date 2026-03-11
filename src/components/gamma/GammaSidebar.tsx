@@ -32,16 +32,16 @@ const GammaSidebar = ({
     { id: 'dashboard', icon: LayoutDashboard, label: 'Overview' },
     ...(moduleSettings?.leadsEnabled !== false ? [{ id: 'leads', icon: UserPlus, label: 'Lead Gen' }] : []),
     ...(moduleSettings?.campaignsEnabled !== false ? [{ id: 'campaigns', icon: Megaphone, label: 'Campaigns' }] : []),
-    { id: 'products', icon: Package, label: 'Products', isSection: true },
-    { id: 'history', icon: PhoneForwarded, label: 'Call History', isSection: true },
-    { id: 'profile', icon: User, label: 'Account', isSection: true },
-    { id: 'call', icon: Bot, label: 'Test Mode', isSection: false },
+    { id: 'products', icon: Package, label: 'Products' },
+    { id: 'history', icon: PhoneForwarded, label: 'Call History' },
+    { id: 'profile', icon: User, label: 'Account' },
+    { id: 'call', icon: Bot, label: 'Test Mode' },
   ];
 
   const collapsed = isCollapsed && !isMobile;
   
   const handleMenuClick = async (item: any) => {
-    if (item.isSection) {
+    if (item.id !== 'call') {
       onSectionChange(item.id);
       if (isMobile) toggleMobileMenu();
     } else if (item.id === 'call') {
@@ -94,7 +94,7 @@ const GammaSidebar = ({
           {!collapsed && <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 font-semibold">Menu</p>}
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const active = activeSection === item.id && item.isSection;
+            const active = activeSection === item.id && item.id !== 'call';
             const isCall = item.id === 'call';
             
             let displayLabel = item.label;
