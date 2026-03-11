@@ -65,60 +65,85 @@ const GammaDashboard = ({ user, userProfile }: { user: any; userProfile: any }) 
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="glass-card overflow-hidden"
+        className="glass-card overflow-hidden relative"
       >
-        <div className="flex items-center justify-between p-4 border-b border-border/30">
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#a855f7] to-[#ec4899]" />
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-border/30 gap-4">
           <div>
-            <h2 className="font-display font-semibold text-foreground">Recent Leads</h2>
-            <p className="text-xs text-muted-foreground">Latest customer acquisitions</p>
+            <h2 className="font-display font-semibold text-foreground flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              Recent Leads
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">Latest customer acquisitions across all channels</p>
           </div>
           <div className="relative">
-            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input className="input-gamma text-xs py-1.5 pl-8 pr-3 w-32" placeholder="Filter..." />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input className="input-gamma text-sm py-2 pl-9 pr-4 w-full sm:w-64 bg-background/50 focus:bg-background transition-colors" placeholder="Search leads..." />
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="table-gamma">
+        <div className="overflow-x-auto p-2">
+          <table className="table-gamma w-full text-left border-collapse">
             <thead>
-              <tr>
-                <th>Customer</th>
-                <th>Contact</th>
-                <th>Source</th>
-                <th>Date</th>
-                <th>Status</th>
+              <tr className="border-b border-border/50 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                <th className="pb-3 pt-2 px-4 font-medium">Customer</th>
+                <th className="pb-3 pt-2 px-4 font-medium">Contact</th>
+                <th className="pb-3 pt-2 px-4 font-medium">Source</th>
+                <th className="pb-3 pt-2 px-4 font-medium">Date</th>
+                <th className="pb-3 pt-2 px-4 font-medium text-right">Status</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border/30">
               {analytics.recentLeads.slice(0, 5).map((lead: any) => (
-                <tr key={lead.id}>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">{lead.name?.charAt(0)}</div>
-                      <span className="text-foreground font-medium">{lead.name}</span>
+                <tr key={lead.id} className="hover:bg-sidebar-accent/50 transition-colors group">
+                  <td className="py-4 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-sm font-bold text-primary shadow-inner">{lead.name?.charAt(0)}</div>
+                      <span className="text-foreground font-semibold">{lead.name}</span>
                     </div>
                   </td>
                   <td className="text-muted-foreground">{lead.number}</td>
                   <td><span className="status-pill active">Firebase</span></td>
                   <td className="text-muted-foreground">{lead.createdAt ? new Date(lead.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
-                  <td><span className="flex items-center gap-1.5"><span className="glow-dot" /> New</span></td>
+                  <td className="py-4 px-4">
+                    <span className="flex items-center justify-end gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> 
+                      <span className="text-emerald-400 font-medium text-sm">New</span>
+                    </span>
+                  </td>
                 </tr>
               ))}
               {sheetLeads.slice(0, 3).map((lead: any, idx: number) => (
-                <tr key={`sh-${idx}`}>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-violet-500/10 flex items-center justify-center text-xs font-bold text-violet-400">{lead.name?.charAt(0)}</div>
-                      <span className="text-foreground font-medium">{lead.name}</span>
+                <tr key={`sh-${idx}`} className="hover:bg-sidebar-accent/50 transition-colors group">
+                  <td className="py-4 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center text-sm font-bold text-violet-400 shadow-inner">{lead.name?.charAt(0)}</div>
+                      <span className="text-foreground font-semibold">{lead.name}</span>
                     </div>
                   </td>
-                  <td className="text-muted-foreground">{lead.number}</td>
+                  <td className="text-sm text-muted-foreground">{lead.number}</td>
                   <td><span className="status-pill" style={{ background: 'hsl(var(--warning) / 0.1)', color: 'hsl(var(--warning))' }}>Sheets</span></td>
-                  <td className="text-muted-foreground">{lead.timestamp || 'N/A'}</td>
-                  <td className="text-muted-foreground">Pending</td>
+                  <td className="text-sm text-muted-foreground">{lead.timestamp || 'N/A'}</td>
+                  <td className="py-4 px-4 text-right">
+                    <span className="text-sm text-muted-foreground font-medium">Pending</span>
+                  </td>
                 </tr>
               ))}
-              {analytics.recentLeads.length === 0 && sheetLeads.length === 0 && (
-                <tr><td colSpan={5} className="text-center py-8 text-muted-foreground">No leads discovered yet.</td></tr>
+              {analytics.recentLeads.length === 0 && sheetLeads.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={5} className="text-center py-12 text-muted-foreground">
+                    <UserPlus size={32} className="mx-auto mb-3 opacity-20" />
+                    <p>No leads discovered yet.</p>
+                  </td>
+                </tr>
+              )}
+              {loading && (
+                <tr>
+                  <td colSpan={5} className="text-center py-12 text-muted-foreground">
+                    <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-2" />
+                    <p>Loading records...</p>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

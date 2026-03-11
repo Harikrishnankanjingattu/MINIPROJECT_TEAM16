@@ -5,13 +5,13 @@ import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBNjuPWI3lZGVtr9xTFgCb42sZOtWF50Ic",
-    authDomain: "miniprojectteam16.firebaseapp.com",
-    projectId: "miniprojectteam16",
-    storageBucket: "miniprojectteam16.firebasestorage.app",
-    messagingSenderId: "212222206184",
-    appId: "1:212222206184:web:b0b0a2b84707012b51695d",
-    measurementId: "G-E83BBDXPYK"
+    apiKey: "AIzaSyB9iqV0sQG0QhSVzR93drPU0ctlLEHmjJI",
+    authDomain: "gamma-1-7b1d9.firebaseapp.com",
+    projectId: "gamma-1-7b1d9",
+    storageBucket: "gamma-1-7b1d9.firebasestorage.app",
+    messagingSenderId: "234599104681",
+    appId: "1:234599104681:web:c04f2262702ccf9eda69b8",
+    measurementId: "G-TGMB9L41TM"
 };
 
 

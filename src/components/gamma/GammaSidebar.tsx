@@ -34,6 +34,7 @@ const GammaSidebar = ({
     ...(moduleSettings?.campaignsEnabled !== false ? [{ id: 'campaigns', icon: Megaphone, label: 'Campaigns' }] : []),
     { id: 'products', icon: Package, label: 'Products' },
     { id: 'history', icon: PhoneForwarded, label: 'Call History' },
+    { id: 'buy', icon: Zap, label: 'Buy Credits' },
     { id: 'profile', icon: User, label: 'Account' },
     { id: 'call', icon: Bot, label: 'Test Mode' },
   ];

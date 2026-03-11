@@ -11,6 +11,7 @@ import GammaProductManager from '../components/gamma/GammaProductManager';
 import GammaProfileSettings from '../components/gamma/GammaProfileSettings';
 import GammaCallHistory from '../components/gamma/GammaCallHistory';
 import GammaMobileNav from '../components/gamma/GammaMobileNav';
+import GammaBuy from '../components/gamma/GammaBuy';
 import { useConversation } from '@elevenlabs/react';
 
 interface Props {
@@ -77,11 +78,12 @@ const SubAdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Pro
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard': return <GammaDashboard user={user} userProfile={userProfile} />;
-      case 'leads': return combinedSettings.leadsEnabled ? <GammaLeadGeneration user={user} /> : <GammaDashboard user={user} userProfile={userProfile} />;
+      case 'leads': return combinedSettings.leadsEnabled ? <GammaLeadGeneration user={user} userProfile={userProfile} /> : <GammaDashboard user={user} userProfile={userProfile} />;
       case 'campaigns': return combinedSettings.campaignsEnabled ? <GammaCampaignManager user={user} /> : <GammaDashboard user={user} userProfile={userProfile} />;
       case 'products': return <GammaProductManager user={user} userProfile={userProfile} googleToken={googleToken} onGoogleAuth={onGoogleAuth} />;
       case 'profile': return <GammaProfileSettings user={user} userProfile={userProfile} googleToken={googleToken} onGoogleAuth={onGoogleAuth} />;
       case 'history': return <GammaCallHistory user={user} />;
+      case 'buy': return <GammaBuy user={user} userProfile={userProfile} />;
       default: return <GammaDashboard user={user} userProfile={userProfile} />;
     }
   };
