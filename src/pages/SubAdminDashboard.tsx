@@ -11,7 +11,7 @@ import GammaProductManager from '../components/gamma/GammaProductManager';
 import GammaProfileSettings from '../components/gamma/GammaProfileSettings';
 import GammaCallHistory from '../components/gamma/GammaCallHistory';
 import GammaMobileNav from '../components/gamma/GammaMobileNav';
-import GammaHelp from '../components/gamma/GammaHelp';
+import { useConversation } from '@elevenlabs/react';
 
 interface Props {
   user: any;
@@ -26,6 +26,8 @@ const SubAdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Pro
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [moduleSettings, setModuleSettings] = useState({ leadsEnabled: true, campaignsEnabled: true });
+  
+  const conversation = useConversation();
 
   const combinedSettings = {
     leadsEnabled: moduleSettings.leadsEnabled && (userProfile?.leadsEnabled !== false),
@@ -80,7 +82,6 @@ const SubAdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Pro
       case 'products': return <GammaProductManager user={user} userProfile={userProfile} googleToken={googleToken} onGoogleAuth={onGoogleAuth} />;
       case 'profile': return <GammaProfileSettings user={user} userProfile={userProfile} googleToken={googleToken} onGoogleAuth={onGoogleAuth} />;
       case 'history': return <GammaCallHistory user={user} />;
-      case 'help': return <GammaHelp />;
       default: return <GammaDashboard user={user} userProfile={userProfile} />;
     }
   };
@@ -111,6 +112,7 @@ const SubAdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Pro
           isMobile={isMobile} isMobileOpen={isMobileMenuOpen}
           moduleSettings={combinedSettings}
           toggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          conversation={conversation}
         />
       )}
 
@@ -122,6 +124,7 @@ const SubAdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Pro
           isMobile={true} isMobileOpen={true}
           moduleSettings={combinedSettings}
           toggleMobileMenu={() => setIsMobileMenuOpen(false)}
+          conversation={conversation}
         />
       )}
 
@@ -134,6 +137,7 @@ const SubAdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Pro
           activeSection={activeSection}
           onSectionChange={setActiveSection}
           moduleSettings={combinedSettings}
+          conversation={conversation}
         />
       )}
     </div>

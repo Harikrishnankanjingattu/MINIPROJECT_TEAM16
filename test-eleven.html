@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<body>
+<elevenlabs-convai agent-id="agent_2601kkewjkdfe91rx16t6camg0qb"></elevenlabs-convai>
+<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" type="text/javascript"></script>
+<script>
+setTimeout(() => {
+  const el = document.querySelector('elevenlabs-convai');
+  console.log(el.shadowRoot ? 'Has ShadowRoot' : 'No ShadowRoot');
+  if (el.shadowRoot) {
+    console.log(el.shadowRoot.innerHTML.substring(0, 500));
+  }
+}, 3000);
+</script>
+</body>
+</html>

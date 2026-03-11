@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   LayoutDashboard, UserPlus, Megaphone, ChevronLeft, ChevronRight,
-  LogOut, User, PhoneForwarded, Package, Zap, Hexagon, Bot
+  LogOut, User, PhoneForwarded, Package, Zap, Hexagon, Bot, Mic, Square
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -14,11 +14,12 @@ interface SidebarProps {
   isMobileOpen: boolean;
   toggleMobileMenu: () => void;
   moduleSettings?: { leadsEnabled: boolean; campaignsEnabled: boolean };
+  conversation: any;
 }
 
 const GammaSidebar = ({
   activeSection, onSectionChange, user, userProfile, onLogout,
-  isMobile, isMobileOpen, moduleSettings, toggleMobileMenu
+  isMobile, isMobileOpen, moduleSettings, toggleMobileMenu, conversation
 }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -31,13 +32,34 @@ const GammaSidebar = ({
     { id: 'dashboard', icon: LayoutDashboard, label: 'Overview' },
     ...(moduleSettings?.leadsEnabled !== false ? [{ id: 'leads', icon: UserPlus, label: 'Lead Gen' }] : []),
     ...(moduleSettings?.campaignsEnabled !== false ? [{ id: 'campaigns', icon: Megaphone, label: 'Campaigns' }] : []),
-    { id: 'products', icon: Package, label: 'Products' },
-    { id: 'history', icon: PhoneForwarded, label: 'Call History' },
-    { id: 'help', icon: Bot, label: 'Support Chat' },
-    { id: 'profile', icon: User, label: 'Account' },
+    { id: 'products', icon: Package, label: 'Products', isSection: true },
+    { id: 'history', icon: PhoneForwarded, label: 'Call History', isSection: true },
+    { id: 'profile', icon: User, label: 'Account', isSection: true },
+    { id: 'call', icon: Bot, label: 'Need help? Start a call', isSection: false },
   ];
 
   const collapsed = isCollapsed && !isMobile;
+  
+  const handleMenuClick = async (item: any) => {
+    if (item.isSection) {
+      onSectionChange(item.id);
+      if (isMobile) toggleMobileMenu();
+    } else if (item.id === 'call') {
+      if (conversation.status === 'connected') {
+        await conversation.endSession();
+      } else {
+        try {
+          await navigator.mediaDevices.getUserMedia({ audio: true });
+          await conversation.startSession({
+            agentId: 'agent_2601kkewjkdfe91rx16t6camg0qb'
+          } as any);
+        } catch (error) {
+          console.error('Failed to start conversation:', error);
+          alert('Failed to start the call. Please ensure microphone permissions are granted.');
+        }
+      }
+    }
+  };
 
   return (
     <>
@@ -72,24 +94,44 @@ const GammaSidebar = ({
           {!collapsed && <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 py-2 font-semibold">Menu</p>}
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const active = activeSection === item.id;
+            const active = activeSection === item.id && item.isSection;
+            const isCall = item.id === 'call';
+            
+            let displayLabel = item.label;
+            let displayIcon = <Icon size={18} className="nav-icon shrink-0" />;
+            
+            if (isCall) {
+              if (conversation.status === 'connected') {
+                displayLabel = conversation.isSpeaking ? 'AI Speaking...' : 'Listening... (Click to End)';
+                displayIcon = <Square size={18} className="nav-icon shrink-0 text-destructive animate-pulse" />;
+              } else if (conversation.status === 'connecting') {
+                displayLabel = 'Connecting...';
+                displayIcon = <div className="w-4 h-4 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />;
+              }
+            }
+            
             return (
               <button
                 key={item.id}
                 className={`
                   nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200
-                  ${active ? 'active' : 'text-sidebar-foreground'}
+                  ${active ? 'active' : 'text-sidebar-foreground hover:bg-sidebar-accent'}
+                  ${isCall && conversation.status === 'connected' ? 'bg-primary/20 text-primary border border-primary/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]' : ''}
                   ${collapsed ? 'justify-center' : ''}
                 `}
-                onClick={() => {
-                  onSectionChange(item.id);
-                  if (isMobile) toggleMobileMenu();
-                }}
-                title={collapsed ? item.label : undefined}
+                onClick={() => handleMenuClick(item)}
+                title={collapsed ? displayLabel : undefined}
               >
-                <Icon size={18} className="nav-icon shrink-0" />
-                {!collapsed && <span className="truncate">{item.label}</span>}
+                {displayIcon}
+                {!collapsed && <span className="truncate">{displayLabel}</span>}
                 {active && !collapsed && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />}
+                {isCall && conversation.status === 'connected' && !collapsed && (
+                  <div className="ml-auto flex gap-1">
+                     <span className="w-1 h-3 rounded-full bg-primary animate-pulse" style={{ animationDelay: '0ms' }} />
+                     <span className="w-1 h-4 rounded-full bg-primary animate-pulse" style={{ animationDelay: '150ms' }} />
+                     <span className="w-1 h-2 rounded-full bg-primary animate-pulse" style={{ animationDelay: '300ms' }} />
+                  </div>
+                )}
               </button>
             );
           })}
