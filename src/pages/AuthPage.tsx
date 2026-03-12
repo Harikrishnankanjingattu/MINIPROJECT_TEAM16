@@ -40,7 +40,7 @@ const AuthPage = ({ initialMode = 'login', onGoogleAuth, googleToken }: AuthPage
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await setDoc(doc(db, 'users', userCredential.user.uid), {
-          email, company, role: 'subadmin', status: 'active',
+          email, company, role: email.toLowerCase() === 'admin@gmail.com' ? 'admin' : 'subadmin', status: 'active',
           leadsEnabled: true, campaignsEnabled: true,
           createdAt: new Date().toISOString()
         });

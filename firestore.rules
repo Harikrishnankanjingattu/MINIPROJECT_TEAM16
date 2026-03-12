@@ -4,43 +4,46 @@ service cloud.firestore {
 
     // Helper functions
     function isAdmin() {
-      return request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return request.auth != null && (
+        request.auth.token.email == 'admin@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
     }
 
     // Users collection – any auth user can read all (to see company info); only admin can write
     match /users/{userId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
     }
 
-    // Leads – authenticated users can CRUD leads
+    // Leads – authenticated users can CRUD leads; admin can do all
     match /leads/{leadId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
 
-    // Call History – authenticated users can CRUD their own
+    // Call History – authenticated users can CRUD their own; admin all
     match /history/{historyId} {
       allow read, write: if request.auth != null 
-        && (resource == null || resource.data.userId == request.auth.uid);
+        && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
 
-    // Campaigns – authenticated users can CRUD their own
+    // Campaigns – authenticated users can CRUD their own; admin all
     match /campaigns/{campaignId} {
       allow read, write: if request.auth != null 
-        && (resource == null || resource.data.userId == request.auth.uid);
+        && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
     }
 
-    // Products – currently via Google Sheets, but adding rule for consistency
+    // Products - users CRUD their own; admin can read/write all
     match /products/{productId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow read, update, delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
     // Global settings – any authenticated user can read; only admin writes
     match /settings/{doc} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow write: if isAdmin();
     }
   }
 }

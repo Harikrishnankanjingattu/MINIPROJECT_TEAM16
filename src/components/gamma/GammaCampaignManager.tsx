@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Megaphone, Plus, X, Users, Calendar, Package } from 'lucide-react';
-import { addCampaign, getCampaigns, getLeads } from '../../services/firebaseService';
-import { readProductsFromGoogleSheets } from '../../services/googleSheets';
+import { Megaphone, Plus, X, Users, Calendar, Package, Download } from 'lucide-react';
+import { addCampaign, getCampaigns, getLeads, getProducts } from '../../services/firebaseService';
 
 const GammaCampaignManager = ({ user }: { user: any }) => {
   const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -17,11 +16,49 @@ const GammaCampaignManager = ({ user }: { user: any }) => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('google_token');
-      const [c, l, p] = await Promise.all([getCampaigns(user.uid), getLeads(user.uid), readProductsFromGoogleSheets(token)]);
+      const [c, l, p] = await Promise.all([
+        getCampaigns(user.uid), 
+        getLeads(user.uid), 
+        getProducts(user.uid)
+      ]);
       setCampaigns(c); setLeads(l); setProducts(p);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
+  };
+
+  const handleDownloadCSV = (campaign: any) => {
+    // Collect selected leads data
+    const selectedLeads = leads.filter(l => campaign.selectedUsers.includes(l.id));
+    const product = products.find(p => p.id === campaign.productId);
+    
+    // Prepare CSV header
+    let csvContent = "Lead Name,Number,Location,Product,Price,Offer Price,Campaign Date,Campaign Status\n";
+    
+    // Prepare CSV rows
+    selectedLeads.forEach(lead => {
+      const row = [
+        `"${(lead.name || 'N/A').replace(/"/g, '""')}"`,
+        `"${(lead.number || 'N/A').replace(/"/g, '""')}"`,
+        `"${(lead.location || 'N/A').replace(/"/g, '""')}"`,
+        `"${(product?.name || 'N/A').replace(/"/g, '""')}"`,
+        `"${(product?.price || '0').toString().replace(/"/g, '""')}"`,
+        `"${(product?.offeredPrice || '0').toString().replace(/"/g, '""')}"`,
+        `"${(campaign.scheduledDate || 'N/A').replace(/"/g, '""')}"`,
+        `"${(campaign.status || 'N/A').replace(/"/g, '""')}"`
+      ].join(",");
+      csvContent += row + "\n";
+    });
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `campaign_${campaign.name.replace(/\s+/g, '_')}_leads.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleUserSelection = (id: string) => {
@@ -48,7 +85,9 @@ const GammaCampaignManager = ({ user }: { user: any }) => {
         setTimeout(() => { setShowModal(false); loadData(); setMessage({ type: '', text: '' }); }, 1000);
         setFormData({ name: '', description: '', selectedUsers: [], scheduledDate: '', scheduledTime: '', productId: '' });
       }
-    } catch (e) { setMessage({ type: 'error', text: 'Error occurred' }); }
+    } catch (e: any) { 
+      setMessage({ type: 'error', text: e.message || 'Error occurred' }); 
+    }
   };
 
   return (
@@ -89,9 +128,18 @@ const GammaCampaignManager = ({ user }: { user: any }) => {
                   <Calendar size={12} /> {new Date(c.scheduledDate).toLocaleDateString()} at {c.scheduledTime}
                 </div>
               )}
-              <div className="flex items-center gap-4 pt-2 border-t border-border/30 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Users size={12} /> {c.selectedUsers?.length || 0}</span>
-                <span>{c.createdAt ? new Date(c.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</span>
+              <div className="flex items-center justify-between pt-3 border-t border-border/30">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Users size={12} /> {c.selectedUsers?.length || 0}</span>
+                  <span>{c.createdAt ? new Date(c.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</span>
+                </div>
+                <button 
+                  onClick={() => handleDownloadCSV(c)}
+                  className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors"
+                  title="Download Leads CSV"
+                >
+                  <Download size={14} />
+                </button>
               </div>
             </div>
           ))}
@@ -134,9 +182,9 @@ const GammaCampaignManager = ({ user }: { user: any }) => {
               <div>
                 <label className="text-xs font-medium text-foreground mb-1 block">Select Leads *</label>
                 <div className="max-h-40 overflow-y-auto border border-border rounded-lg p-2 space-y-1">
-                  {leads.length === 0 ? <p className="text-xs text-muted-foreground text-center py-2">No leads</p> : leads.map(l => (
+                  {leads.length === 0 ? <p className="text-xs text-muted-foreground text-center py-2">No leads available</p> : leads.map(l => (
                     <label key={l.id} className="flex items-center gap-2 p-1.5 rounded hover:bg-secondary/30 cursor-pointer text-sm text-foreground">
-                      <input type="checkbox" checked={formData.selectedUsers.includes(l.id)} onChange={() => handleUserSelection(l.id)} className="rounded border-border" />
+                      <input type="checkbox" checked={formData.selectedUsers?.includes(l.id)} onChange={() => handleUserSelection(l.id)} className="rounded border-border" />
                       {l.name} - {l.number}
                     </label>
                   ))}

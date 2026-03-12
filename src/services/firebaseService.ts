@@ -1,13 +1,14 @@
 import { db } from '../lib/firebase';
 import {
   collection, addDoc, getDocs, query, orderBy,
-  serverTimestamp, doc, updateDoc, deleteDoc
+  serverTimestamp, doc, updateDoc, deleteDoc, where
 } from 'firebase/firestore';
 
 const LEADS_COLLECTION = 'leads';
 const CAMPAIGNS_COLLECTION = 'campaigns';
 const USERS_COLLECTION = 'users';
 const HISTORY_COLLECTION = 'history';
+const PRODUCTS_COLLECTION = 'products';
 
 export const addLead = async (leadData: any, userId: string) => {
   try {
@@ -23,16 +24,31 @@ export const addLead = async (leadData: any, userId: string) => {
 
 export const getLeads = async (userId: string) => {
   try {
-    const q = query(collection(db, LEADS_COLLECTION), orderBy('createdAt', 'desc'));
+    const q = query(
+      collection(db, LEADS_COLLECTION),
+      where('userId', '==', userId)
+    );
     const querySnapshot = await getDocs(q);
     const leads: any[] = [];
     querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.userId === userId) leads.push({ id: doc.id, ...data });
+      leads.push({ id: doc.id, ...doc.data() });
     });
-    return leads;
+    // Client-side sort to avoid index requirement
+    return leads.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   } catch (error) {
     console.error('Error getting leads:', error);
+    return [];
+  }
+};
+
+export const getAllLeads = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, LEADS_COLLECTION));
+    const leads: any[] = [];
+    querySnapshot.forEach((doc) => { leads.push({ id: doc.id, ...doc.data() }); });
+    return leads;
+  } catch (error) {
+    console.error('Error getting all leads:', error);
     return [];
   }
 };
@@ -59,15 +75,30 @@ export const addCampaign = async (campaignData: any, userId: string) => {
 
 export const getCampaigns = async (userId: string) => {
   try {
-    const q = query(collection(db, CAMPAIGNS_COLLECTION), orderBy('createdAt', 'desc'));
+    const q = query(
+      collection(db, CAMPAIGNS_COLLECTION),
+      where('userId', '==', userId)
+    );
     const querySnapshot = await getDocs(q);
     const campaigns: any[] = [];
     querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.userId === userId) campaigns.push({ id: doc.id, ...data });
+      campaigns.push({ id: doc.id, ...doc.data() });
     });
+    // Client-side sort
+    return campaigns.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  } catch (error) {
+    return [];
+  }
+};
+
+export const getAllCampaigns = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, CAMPAIGNS_COLLECTION));
+    const campaigns: any[] = [];
+    querySnapshot.forEach((doc) => { campaigns.push({ id: doc.id, ...doc.data() }); });
     return campaigns;
   } catch (error) {
+    console.error('Error getting all campaigns:', error);
     return [];
   }
 };
@@ -149,5 +180,72 @@ export const getCallHistory = async (userId: string) => {
     return history;
   } catch (error) {
     return [];
+  }
+};
+
+export const addProduct = async (productData: any, userId: string) => {
+  try {
+    const docRef = await addDoc(collection(db, PRODUCTS_COLLECTION), {
+      ...productData, userId, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+    });
+    return { success: true, id: docRef.id };
+  } catch (error: any) {
+    console.error('Error adding product:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const getProducts = async (userId: string) => {
+  try {
+    const q = query(
+      collection(db, PRODUCTS_COLLECTION), 
+      where('userId', '==', userId)
+    );
+    const querySnapshot = await getDocs(q);
+    const products: any[] = [];
+    querySnapshot.forEach((doc) => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
+    // Sort client-side to avoid composite index requirement
+    return products.sort((a, b) => {
+      const dateA = a.createdAt?.seconds || 0;
+      const dateB = b.createdAt?.seconds || 0;
+      return dateB - dateA;
+    });
+  } catch (error) {
+    console.error('Error getting products:', error);
+    return [];
+  }
+};
+
+export const getAllProducts = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, PRODUCTS_COLLECTION));
+    const products: any[] = [];
+    querySnapshot.forEach((doc) => { products.push({ id: doc.id, ...doc.data() }); });
+    return products;
+  } catch (error) {
+    console.error('Error getting all products:', error);
+    return [];
+  }
+};
+
+export const updateProduct = async (productId: string, updates: any) => {
+  try {
+    await updateDoc(doc(db, PRODUCTS_COLLECTION, productId), { ...updates, updatedAt: serverTimestamp() });
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error updating product:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const deleteProduct = async (productId: string) => {
+  try {
+    await deleteDoc(doc(db, PRODUCTS_COLLECTION, productId));
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error deleting product:', error);
+    return { success: false, error: error.message };
   }
 };

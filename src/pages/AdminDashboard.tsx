@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react';
 import { db, auth } from '../lib/firebase';
-import { collection, getDocs, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, getDoc, setDoc, query, where } from 'firebase/firestore';
 import {
   LogOut, Search, Users, ShieldCheck, Settings2, ToggleLeft,
-  ToggleRight, Package, Activity, Lock, Unlock, Zap, Menu
+  ToggleRight, Package, Activity, Lock, Unlock, Zap, Menu, X, Megaphone, Calendar, UserPlus
 } from 'lucide-react';
 import GammaProductManager from '../components/gamma/GammaProductManager';
+import { getAllLeads, getAllCampaigns, getAllProducts } from '../services/firebaseService';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
+  ResponsiveContainer, AreaChart, Area, Cell
+} from 'recharts';
 
 interface Props {
   user: any;
@@ -23,6 +28,12 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [moduleSettings, setModuleSettings] = useState({ leadsEnabled: true, campaignsEnabled: true });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [userActivity, setUserActivity] = useState<{ leads: any[], campaigns: any[] }>({ leads: [], campaigns: [] });
+  const [isActivityLoading, setIsActivityLoading] = useState(false);
+  const [globalLeads, setGlobalLeads] = useState<any[]>([]);
+  const [globalCampaigns, setGlobalCampaigns] = useState<any[]>([]);
+  const [globalProducts, setGlobalProducts] = useState<any[]>([]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 1024);
@@ -34,8 +45,21 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
 
   const fetchData = async () => {
     setLoading(true);
-    await Promise.all([fetchUsers(), fetchModuleSettings()]);
-    setLoading(false);
+    try {
+      await Promise.all([fetchUsers(), fetchModuleSettings()]);
+      const [l, c, p] = await Promise.all([
+        getAllLeads(),
+        getAllCampaigns(),
+        getAllProducts()
+      ]);
+      setGlobalLeads(l);
+      setGlobalCampaigns(c);
+      setGlobalProducts(p);
+    } catch (e) {
+      console.error("Error fetching admin data:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchModuleSettings = async () => {
@@ -87,6 +111,26 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
     totalCredits: users.reduce((acc, curr) => acc + (curr.credits || 0), 0)
   };
 
+  const fetchUserActivity = async (targetUser: any) => {
+    setSelectedUser(targetUser);
+    setIsActivityLoading(true);
+    try {
+      const [leadsSnap, campaignsSnap] = await Promise.all([
+        getDocs(query(collection(db, 'leads'), where('userId', '==', targetUser.id))),
+        getDocs(query(collection(db, 'campaigns'), where('userId', '==', targetUser.id)))
+      ]);
+      
+      setUserActivity({
+        leads: leadsSnap.docs.map(d => ({ id: d.id, ...d.data() })),
+        campaigns: campaignsSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+      });
+    } catch (e) {
+      console.error("Error fetching activity:", e);
+    } finally {
+      setIsActivityLoading(false);
+    }
+  };
+
   const handleLogout = async () => { try { await auth.signOut(); } catch (e) { console.error(e); } };
 
   if (loading) return (
@@ -97,7 +141,7 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       {isMobile && (
         <header className="fixed top-0 left-0 right-0 z-20 h-14 bg-card/90 backdrop-blur-xl border-b border-border flex items-center justify-between px-4">
           <div className="flex items-center gap-2">
@@ -149,6 +193,9 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
           <button className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all ${activeTab === 'users' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-secondary/50'}`} onClick={() => setActiveTab('users')}>
             <Users size={16} /> Partners
           </button>
+          <button className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all ${activeTab === 'analytics' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-secondary/50'}`} onClick={() => setActiveTab('analytics')}>
+            <Activity size={16} /> Analytics
+          </button>
           <button className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all ${activeTab === 'products' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-secondary/50'}`} onClick={() => setActiveTab('products')}>
             <Package size={16} /> Inventory
           </button>
@@ -156,7 +203,6 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
 
         {activeTab === 'users' ? (
           <div className="space-y-6">
-            {/* Feature Flags */}
             <div className="glass-card p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Settings2 size={18} className="text-primary" />
@@ -180,7 +226,6 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
               </div>
             </div>
 
-            {/* Users Table */}
             <div className="glass-card overflow-hidden">
               <div className="p-4 border-b border-border/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h2 className="font-display font-semibold text-foreground">Sub-Admin Directory</h2>
@@ -214,32 +259,37 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
                     {filteredUsers.length === 0 ? (
                       <tr><td colSpan={8} className="text-center py-8 text-muted-foreground">No sub-admins found.</td></tr>
                     ) : filteredUsers.map(u => (
-                      <tr key={u.id}>
-                        <td>
-                          <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                      <tr key={u.id} className="cursor-pointer hover:bg-secondary/20 transition-colors" onClick={() => fetchUserActivity(u)}>
+                        <td className="py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-sm font-bold text-primary border border-primary/20">
                               {(u.company || u.email).charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-foreground">{u.company || 'Private'}</p>
-                              <p className="text-[10px] text-muted-foreground">ID: {u.id.slice(0, 8)}</p>
+                              <p className="text-sm font-bold text-foreground leading-none mb-1">{u.company || 'Private Entity'}</p>
+                              <p className="text-[10px] text-muted-foreground font-mono">UID: {u.id.slice(0, 12)}</p>
                             </div>
                           </div>
                         </td>
                         <td className="text-sm text-muted-foreground">{u.email}</td>
-                        <td className="text-sm font-semibold text-foreground">{u.credits || 0}</td>
+                        <td className="text-sm">
+                          <div className="flex items-center gap-1.5">
+                            <Zap size={14} className="text-primary fill-primary/20" />
+                            <span className="font-bold text-foreground">{u.credits || 0}</span>
+                          </div>
+                        </td>
                         <td>
-                          <button className={`text-xs font-semibold px-2 py-1 rounded ${u.leadsEnabled !== false ? 'bg-emerald-500/10 text-emerald-400' : 'bg-destructive/10 text-destructive'}`} onClick={() => toggleUserModule(u.id, 'leadsEnabled', u.leadsEnabled)}>
-                            {u.leadsEnabled !== false ? 'ON' : 'OFF'}
+                          <button className={`text-[10px] font-bold px-2 py-0.5 rounded border ${u.leadsEnabled !== false ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-destructive/10 text-destructive border-destructive/20'}`} onClick={(e) => { e.stopPropagation(); toggleUserModule(u.id, 'leadsEnabled', u.leadsEnabled); }}>
+                            {u.leadsEnabled !== false ? 'ENABLED' : 'DISABLED'}
                           </button>
                         </td>
                         <td>
-                          <button className={`text-xs font-semibold px-2 py-1 rounded ${u.campaignsEnabled !== false ? 'bg-emerald-500/10 text-emerald-400' : 'bg-destructive/10 text-destructive'}`} onClick={() => toggleUserModule(u.id, 'campaignsEnabled', u.campaignsEnabled)}>
-                            {u.campaignsEnabled !== false ? 'ON' : 'OFF'}
+                          <button className={`text-[10px] font-bold px-2 py-0.5 rounded border ${u.campaignsEnabled !== false ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-destructive/10 text-destructive border-destructive/20'}`} onClick={(e) => { e.stopPropagation(); toggleUserModule(u.id, 'campaignsEnabled', u.campaignsEnabled); }}>
+                            {u.campaignsEnabled !== false ? 'ENABLED' : 'DISABLED'}
                           </button>
                         </td>
                         <td>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                             <input type="number" className="input-gamma text-xs py-1 px-2 w-16" defaultValue={u.sessionTimeout || ''} onBlur={e => updateTimer(u.id, e.target.value)} />
                             <span className="text-[10px] text-muted-foreground">min</span>
                           </div>
@@ -247,8 +297,8 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
                         <td><span className={`status-pill ${u.status}`}>{u.status === 'active' ? 'Active' : 'Restricted'}</span></td>
                         <td>
                           <button
-                            className={`text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1 ${u.status === 'active' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'}`}
-                            onClick={() => toggleUserStatus(u.id, u.status)}
+                            className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all ${u.status === 'active' ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'}`}
+                            onClick={(e) => { e.stopPropagation(); toggleUserStatus(u.id, u.status); }}
                           >
                             {u.status === 'active' ? <><Lock size={12} /> Restrict</> : <><Unlock size={12} /> Authorize</>}
                           </button>
@@ -260,11 +310,149 @@ const AdminDashboard = ({ user, userProfile, googleToken, onGoogleAuth }: Props)
               </div>
             </div>
           </div>
+        ) : activeTab === 'analytics' ? (
+          <div className="space-y-6">
+            <div className="grid lg:grid-cols-2 gap-6">
+              <div className="glass-card p-6">
+                <h3 className="text-sm font-bold font-display text-foreground mb-6 flex items-center gap-2">
+                  <UserPlus size={16} className="text-primary" /> Lead Ingestion Analytics
+                </h3>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={globalLeads.slice(-10).map((l, i) => ({ name: `Pt ${i+1}`, leads: 1 }))}>
+                      <defs>
+                        <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#a855f7" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
+                      <XAxis dataKey="name" stroke="#525252" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#525252" fontSize={10} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={{ backgroundColor: '#171717', border: '1px solid #262626', borderRadius: '8px', fontSize: '10px' }} />
+                      <Area type="monotone" dataKey="leads" stroke="#a855f7" fill="url(#colorLeads)" strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div className="glass-card p-6">
+                <h3 className="text-sm font-bold font-display text-foreground mb-6 flex items-center gap-2">
+                  <Megaphone size={16} className="text-primary" /> System Campaigns
+                </h3>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={[
+                      { name: 'Active', value: globalCampaigns.filter(c => c.status === 'active').length },
+                      { name: 'Other', value: globalCampaigns.filter(c => c.status !== 'active').length }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
+                      <XAxis dataKey="name" stroke="#525252" fontSize={10} />
+                      <YAxis stroke="#525252" fontSize={10} />
+                      <Tooltip contentStyle={{ backgroundColor: '#171717', border: '1px solid #262626', borderRadius: '8px', fontSize: '10px' }} />
+                      <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                        <Cell fill="#a855f7" />
+                        <Cell fill="#3b82f6" />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
-          <GammaProductManager user={user} userProfile={userProfile} googleToken={googleToken} onGoogleAuth={onGoogleAuth} />
+          <div className="space-y-6">
+            <div className="glass-card overflow-hidden">
+              <div className="p-4 border-b border-border/30">
+                <h2 className="font-display font-semibold text-foreground">Global Product Directory</h2>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="table-gamma">
+                  <thead>
+                    <tr>
+                      <th>Company</th>
+                      <th>Product</th>
+                      <th>Price</th>
+                      <th>Offer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {globalProducts.length === 0 ? (
+                      <tr><td colSpan={4} className="text-center py-8">No products found.</td></tr>
+                    ) : globalProducts.map(p => {
+                      const company = users.find(u => u.id === p.userId)?.company || 'N/A';
+                      return (
+                        <tr key={p.id}>
+                          <td className="text-sm">{company}</td>
+                          <td className="text-sm font-semibold">{p.name}</td>
+                          <td className="text-sm">₹{p.price}</td>
+                          <td className="text-sm text-emerald-400 font-bold">₹{p.offeredPrice}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="pt-6 border-t border-border/30">
+              <h3 className="section-title text-sm mb-4">Personal Inventory Manager</h3>
+              <GammaProductManager user={user} userProfile={userProfile} googleToken={googleToken} onGoogleAuth={onGoogleAuth} />
+            </div>
+          </div>
         )}
       </main>
 
+      {selectedUser && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setSelectedUser(null)} />
+          <div className="relative w-full max-w-xl bg-card border-l border-border h-full shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300">
+            <div className="sticky top-0 bg-card/90 backdrop-blur-md p-6 border-b border-border flex items-center justify-between z-10">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-xl font-bold text-primary border border-primary/20">
+                  {(selectedUser.company || selectedUser.email).charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold font-display text-foreground">{selectedUser.company || 'User Details'}</h2>
+                  <p className="text-sm text-muted-foreground">{selectedUser.email}</p>
+                </div>
+              </div>
+              <button onClick={() => setSelectedUser(null)} className="p-2 rounded-full hover:bg-secondary text-muted-foreground"><X size={24} /></button>
+            </div>
+            <div className="p-6 space-y-8">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-secondary/30 p-4 rounded-2xl shadow-sm border border-border">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Credits</p>
+                  <p className="text-xl font-bold text-primary">{selectedUser.credits || 0}</p>
+                </div>
+                <div className="bg-secondary/30 p-4 rounded-2xl shadow-sm border border-border">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Leads</p>
+                  <p className="text-xl font-bold text-foreground">{userActivity.leads.length}</p>
+                </div>
+                <div className="bg-secondary/30 p-4 rounded-2xl shadow-sm border border-border">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Campaigns</p>
+                  <p className="text-xl font-bold text-foreground">{userActivity.campaigns.length}</p>
+                </div>
+              </div>
+              {isActivityLoading ? (
+                <div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>
+              ) : (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-sm font-bold mb-3 flex items-center gap-2 text-foreground"><Users size={16} className="text-primary" /> Recent Leads</h3>
+                    <div className="space-y-2">
+                       {userActivity.leads.slice(0, 5).map((l: any) => (
+                         <div key={l.id} className="p-3 rounded-xl bg-secondary/20 border border-border/50">
+                           <p className="text-sm font-medium text-foreground">{l.name}</p>
+                           <p className="text-[10px] text-muted-foreground">{l.number}</p>
+                         </div>
+                       ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

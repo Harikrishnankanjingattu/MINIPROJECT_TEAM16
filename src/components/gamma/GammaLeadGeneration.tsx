@@ -77,6 +77,24 @@ const GammaLeadGeneration = ({ user, userProfile }: { user: any, userProfile?: a
     link.click();
   };
 
+  const addTestLead = async () => {
+    const testLead = {
+      name: `Test User ${Math.floor(Math.random() * 1000)}`,
+      number: `9${Math.floor(100000000 + Math.random() * 900000000)}`,
+      remarks: 'Automated test lead',
+      isTest: true
+    };
+    setSubmitting(true);
+    try {
+      const result = await addLead({ ...testLead, timestamp: new Date().toISOString() }, user.uid);
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Test lead added (credits preserved for testing)!' });
+        loadLeads();
+      }
+    } catch (e) { console.error(e); }
+    finally { setSubmitting(false); }
+  };
+
   const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -169,6 +187,9 @@ const GammaLeadGeneration = ({ user, userProfile }: { user: any, userProfile?: a
             <button className="btn-ghost text-sm flex items-center gap-1.5" onClick={downloadCSV} disabled={!leads.length}>
               <Download size={16} /> Export
             </button>
+            <button className="btn-ghost text-sm flex items-center gap-1.5 text-primary" onClick={addTestLead} disabled={submitting}>
+              <RefreshCw size={16} /> Add Test Lead
+            </button>
             <button className="btn-ghost text-sm flex items-center gap-1.5" onClick={loadLeads} disabled={loading}>
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
             </button>
@@ -232,8 +253,8 @@ const GammaLeadGeneration = ({ user, userProfile }: { user: any, userProfile?: a
                     <span className="text-[10px] text-muted-foreground">
                       {lead.createdAt ? new Date(lead.createdAt.seconds * 1000).toLocaleDateString() : ''}
                     </span>
-                    <button className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(lead.id, lead.name)}>
-                      <Trash2 size={14} />
+                    <button className="p-1.5 rounded-md hover:bg-primary/10 text-muted-foreground" onClick={() => alert('Lead deletion is disabled to prevent data loss.')}>
+                      <AlertTriangle size={14} />
                     </button>
                   </div>
                 </div>
