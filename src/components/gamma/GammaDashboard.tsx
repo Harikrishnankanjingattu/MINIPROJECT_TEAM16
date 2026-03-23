@@ -68,7 +68,7 @@ const GammaDashboard = ({ user, userProfile }: { user: any; userProfile: any }) 
         className="glass-card overflow-hidden relative"
       >
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#a855f7] to-[#ec4899]" />
-        
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-border/30 gap-4">
           <div>
             <h2 className="font-display font-semibold text-foreground flex items-center gap-2">
@@ -107,7 +107,7 @@ const GammaDashboard = ({ user, userProfile }: { user: any; userProfile: any }) 
                   <td className="text-muted-foreground">{lead.createdAt ? new Date(lead.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
                   <td className="py-4 px-4">
                     <span className="flex items-center justify-end gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" /> 
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
                       <span className="text-emerald-400 font-medium text-sm">New</span>
                     </span>
                   </td>
